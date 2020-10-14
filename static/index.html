@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat Application</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font: 13px Helvetica, Arial;
+        display: flex;
+        flex-flow: column;
+        justify-content: center;
+        align-items: center;
+        margin: 10% 20%;
+        max-height: 100vh;
+        overflow-y: hidden;
+        background-color: #c6d8ff;
+      }
+      .content-wrap {
+        display: relative;
+        height: 80vh;
+        overflow-y: scroll;
+        width: 100%;
+        background-color: #6b5ca5;
+      }
+      form {
+        background: transparent;
+        padding: 3px;
+        bottom: 0;
+        position: absolute;
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: space-between;
+      }
+      form input {
+        border: 0;
+        padding: 10px;
+        margin-right: 0.5%;
+      }
+      form button {
+        background: #4c1036;
+        border: none;
+        padding: 10px;
+        color: white;
+      }
+      div {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      #messages {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+      }
+      #messages li {
+        padding: 5px 10px;
+      }
+      .chat-msg {
+        background-color: #eee;
+      }
+      .chat-msg--user {
+        background-color: aquamarine;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>My chat application</h1>
+    <section class="content-wrap">
+      <ul id="messages"></ul>
+      <form action="">
+        <div><input id="msg" autocomplete="off" /><button>Send</button></div>
+        <div id="change_username">
+          <input id="username" type="text" /><button
+            id="send_user"
+            type="button"
+          >
+            Change username
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Load socket io on client side -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.js"
+      integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      const socket = io();
+
+      const chatBox = document.querySelector('form');
+      const chatInput = document.getElementById('msg');
+      const messages = document.getElementById('messages');
+
+      chatBox.addEventListener('submit', (e) => {
+        e.preventDefault();
+        socket.emit('chat', chatInput.value);
+        chatInput.value = '';
+      });
+
+      const render = ({ message, id }) => {
+        const listItem = document.createElement('li');
+        listItem.classList.add('chat-msg');
+        if (id === socket.id) {
+          listItem.classList.add('chat-msg--user');
+        }
+        listItem.innerText = message;
+        messages.appendChild(listItem);
+      };
+
+      socket.on('chat', (data) => {
+        render(data);
+      });
+    </script>
+  </body>
+</html>
