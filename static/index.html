@@ -16,72 +16,94 @@
         flex-flow: column;
         justify-content: center;
         align-items: center;
-        margin: 10% 20%;
-        max-height: 100vh;
+        margin: 10% 10%;
+        /* max-height: 100vh; */
         overflow-y: hidden;
-        background-color: #c6d8ff;
+        background-color: rgb(235, 235, 211);
       }
       .content-wrap {
-        display: relative;
+        position: fixed;
+        top: 10%;
         height: 80vh;
         overflow-y: scroll;
-        width: 100%;
-        background-color: #6b5ca5;
+        width: 80%;
+        background-color: white;
+        border-radius: 10px;
       }
       form {
         background: transparent;
         padding: 3px;
-        bottom: 0;
-        position: absolute;
+        bottom: 4%;
+        position: fixed;
         display: flex;
         flex-flow: row nowrap;
         justify-content: space-between;
       }
       form input {
-        border: 0;
-        padding: 10px;
-        margin-right: 0.5%;
+        border: 0.5px solid grey;
+        border-radius: 10px 0 0 10px;
+        padding: 8px;
+        height: 35px;
       }
       form button {
-        background: #4c1036;
+        background: rgb(8, 61, 119);
         border: none;
-        padding: 10px;
+        padding: 8px;
         color: white;
+        white-space: nowrap;
+        border-radius: 0 10px 10px 0;
+        height: 35px;
       }
       div {
         display: flex;
         align-items: center;
         justify-content: space-between;
+        margin: 0 2%;
       }
       #messages {
         list-style-type: none;
         margin: 0;
         padding: 0;
+        display: flex;
+        flex-flow: column nowrap;
       }
       #messages li {
-        padding: 5px 10px;
+        padding: 8px 12px;
+        max-width: 200px;
+        display: inline-block;
+        margin: 1% 2%;
+        box-shadow: 6px 4px 18px 0px rgba(0, 0, 0, 0.2);
       }
       .chat-msg {
-        background-color: #eee;
+        background-color: rgb(132, 145, 163);
+        color: white;
+        border-radius: 10px 10px 3px 10px;
       }
       .chat-msg--user {
-        background-color: aquamarine;
+        background-color: rgb(160, 26, 125);
+        align-self: flex-end;
+        color: white;
+        border-radius: 10px 10px 10px 3px;
       }
     </style>
   </head>
   <body>
-    <h1>My chat application</h1>
     <section class="content-wrap">
       <ul id="messages"></ul>
       <form action="">
-        <div><input id="msg" autocomplete="off" /><button>Send</button></div>
+        <div>
+          <input
+            id="msg"
+            autocomplete="off"
+            placeholder="Type your message..."
+          /><button>Send</button>
+        </div>
         <div id="change_username">
-          <input id="username" type="text" /><button
-            id="send_user"
-            type="button"
-          >
-            Change username
-          </button>
+          <input
+            id="username"
+            type="text"
+            placeholder="Enter username..."
+          /><button id="send_user" type="button">Change user</button>
         </div>
       </form>
     </section>
@@ -99,6 +121,8 @@
       const chatBox = document.querySelector('form');
       const chatInput = document.getElementById('msg');
       const messages = document.getElementById('messages');
+      const username = document.getElementById('username');
+      const send_user = document.getElementById('send_user');
 
       chatBox.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -106,13 +130,17 @@
         chatInput.value = '';
       });
 
-      const render = ({ message, id }) => {
+      send_user.addEventListener('click', () => {
+        socket.emit('change_username', { username: username.value });
+      });
+
+      const render = ({ message, id, username }) => {
         const listItem = document.createElement('li');
         listItem.classList.add('chat-msg');
         if (id === socket.id) {
           listItem.classList.add('chat-msg--user');
         }
-        listItem.innerText = message;
+        listItem.innerText = `${username}: ${message}`;
         messages.appendChild(listItem);
       };
 

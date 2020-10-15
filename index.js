@@ -18,12 +18,21 @@ app.use(express.static(path.join(__dirname, '/static')));
 // Listen on connection event for incoming sockets and log to console
 
 io.on('connection', (socket) => {
-  socket.username = 'Anonymous';
+  console.log('New user connected');
+  socket.join('my_room');
+  const room = io.sockets.adapter.rooms['my_room'];
+  if (room.length === 1) {
+    socket.username = 'User 1';
+  } else {
+    socket.username = 'User 2';
+  }
+
   socket.on('change_username', (data) => {
     socket.username = data.username;
   });
+
   socket.on('chat', (message) => {
-    io.emit('chat', { message, id: socket.id });
+    io.emit('chat', { message, id: socket.id, username: socket.username });
   });
 });
 
